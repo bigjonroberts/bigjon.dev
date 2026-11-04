@@ -1,0 +1,18 @@
+---
+layout: base.njk
+---
+<section class="mb-10">
+  <h1 class="text-3xl font-extrabold tracking-tight sm:text-4xl">Hi, I'm {{ site.author }}.</h1>
+  <p class="mt-4 text-lg text-gray-700 dark:text-gray-300">{{ site.description }}</p>
+</section>
+
+<section>
+  <h2 class="text-sm font-semibold uppercase tracking-wide text-gray-600 dark:text-gray-400">Latest posts</h2>
+  {% set posts = collections.posts.slice().reverse().slice(0, 5) %}
+  {% if posts.length %}
+    {% include "post-list.njk" %}
+    <p class="mt-4"><a href="/blog/" class="font-medium text-primary hover:underline dark:text-primary-light">All posts &rarr;</a></p>
+  {% else %}
+    <p class="mt-4 text-gray-700 dark:text-gray-300">No posts yet.</p>
+  {% endif %}
+</section>

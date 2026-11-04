@@ -1,0 +1,95 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+/* Templates and markdown both use these classes. */
+@source "../../../src";
+
+@theme {
+  --color-primary: #0f6cbd;
+  --color-primary-light: #6cb4f5;
+}
+
+@layer base {
+  a {
+    text-underline-offset: 2px;
+  }
+}
+
+/* The typography plugin styles <code> inside <pre>; drop its backticks on inline code. */
+.prose :where(code):not(:where(pre code))::before,
+.prose :where(code):not(:where(pre code))::after {
+  content: none;
+}
+
+/* Prism token colors for @11ty/eleventy-plugin-syntaxhighlight (GitHub-like light and dark). */
+pre[class*="language-"] {
+  background: #f6f8fa;
+  color: #1f2328;
+}
+
+.token.comment,
+.token.prolog,
+.token.doctype,
+.token.cdata { color: #59636e; font-style: italic; }
+.token.punctuation { color: #1f2328; }
+.token.property,
+.token.tag,
+.token.boolean,
+.token.number,
+.token.constant,
+.token.symbol,
+.token.deleted { color: #0550ae; }
+.token.selector,
+.token.attr-name,
+.token.string,
+.token.char,
+.token.builtin,
+.token.inserted { color: #0a3069; }
+.token.operator,
+.token.entity,
+.token.url { color: #cf222e; }
+.token.atrule,
+.token.attr-value,
+.token.keyword { color: #cf222e; }
+.token.function,
+.token.class-name { color: #8250df; }
+.token.regex,
+.token.important,
+.token.variable { color: #953800; }
+
+@media (prefers-color-scheme: dark) {
+  pre[class*="language-"] {
+    background: #161b22;
+    color: #e6edf3;
+  }
+
+  .token.comment,
+  .token.prolog,
+  .token.doctype,
+  .token.cdata { color: #8b949e; }
+  .token.punctuation { color: #e6edf3; }
+  .token.property,
+  .token.tag,
+  .token.boolean,
+  .token.number,
+  .token.constant,
+  .token.symbol,
+  .token.deleted { color: #79c0ff; }
+  .token.selector,
+  .token.attr-name,
+  .token.string,
+  .token.char,
+  .token.builtin,
+  .token.inserted { color: #a5d6ff; }
+  .token.operator,
+  .token.entity,
+  .token.url,
+  .token.atrule,
+  .token.attr-value,
+  .token.keyword { color: #ff7b72; }
+  .token.function,
+  .token.class-name { color: #d2a8ff; }
+  .token.regex,
+  .token.important,
+  .token.variable { color: #ffa657; }
+}

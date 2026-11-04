@@ -1,0 +1,18 @@
+{#- Lists `posts` (newest first is the caller's job). -#}
+<ul class="divide-y divide-gray-200 dark:divide-gray-800">
+  {%- for post in posts %}
+  <li class="py-6">
+    <article>
+      <time datetime="{{ post.date | date('YYYY-MM-DD') }}" class="text-sm text-gray-600 dark:text-gray-400">{{ post.date | date('MMMM D, YYYY') }}</time>
+      <h2 class="mt-1 text-xl font-bold"><a href="{{ post.url }}" class="hover:text-primary dark:hover:text-primary-light">{{ post.data.title }}</a></h2>
+      {% if post.data.description %}<p class="mt-2 text-gray-700 dark:text-gray-300">{{ post.data.description }}</p>{% endif %}
+      {% set postTags = post.data.tags | filterTagList %}
+      {% if postTags.length %}
+      <ul class="mt-3 flex flex-wrap gap-2" aria-label="Tags">
+        {% for tag in postTags %}<li>{% include "tag-link.njk" %}</li>{% endfor %}
+      </ul>
+      {% endif %}
+    </article>
+  </li>
+  {%- endfor %}
+</ul>

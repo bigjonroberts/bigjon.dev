@@ -1,0 +1,25 @@
+---
+layout: base.njk
+title: Blog
+pagination:
+  data: collections.posts
+  size: 10
+  reverse: true
+  alias: posts
+permalink: "/blog/{% if pagination.pageNumber > 0 %}page/{{ pagination.pageNumber + 1 }}/{% endif %}"
+---
+<h1 class="text-3xl font-extrabold tracking-tight sm:text-4xl">Blog</h1>
+
+{% if posts.length %}
+  {% include "post-list.njk" %}
+{% else %}
+  <p class="mt-4 text-gray-700 dark:text-gray-300">No posts yet.</p>
+{% endif %}
+
+{% if pagination.pages.length > 1 %}
+<nav class="mt-8 flex justify-between text-sm" aria-label="Blog pages">
+  <div>{% if pagination.href.previous %}<a href="{{ pagination.href.previous }}" class="text-primary hover:underline dark:text-primary-light">&larr; Newer posts</a>{% endif %}</div>
+  <div>Page {{ pagination.pageNumber + 1 }} of {{ pagination.pages.length }}</div>
+  <div>{% if pagination.href.next %}<a href="{{ pagination.href.next }}" class="text-primary hover:underline dark:text-primary-light">Older posts &rarr;</a>{% endif %}</div>
+</nav>
+{% endif %}

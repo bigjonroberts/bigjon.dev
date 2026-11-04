@@ -1,0 +1,16 @@
+---
+layout: base.njk
+pagination:
+  data: collections.tagList
+  size: 1
+  alias: tag
+eleventyComputed:
+  title: "Posts tagged #{{ tag }}"
+permalink: "/tags/{{ tag | slugify }}/"
+---
+<h1 class="text-3xl font-extrabold tracking-tight sm:text-4xl">#{{ tag }}</h1>
+
+{% set posts = collections[tag].slice().reverse() %}
+{% include "post-list.njk" %}
+
+<p class="mt-6"><a href="/tags/" class="font-medium text-primary hover:underline dark:text-primary-light">&larr; All tags</a></p>

@@ -1,0 +1,14 @@
+---
+layout: base.njk
+title: Page Not Found
+description: The page you were looking for could not be found.
+permalink: /404.html
+eleventyExcludeFromCollections: true
+---
+{#- GitHub Pages serves /404.html for unknown paths at any depth, so every link must stay root-relative (HtmlBasePlugin adds PATH_PREFIX). -#}
+<h1 class="text-3xl font-extrabold tracking-tight sm:text-4xl">Page Not Found</h1>
+<p class="mt-4 text-lg text-gray-700 dark:text-gray-300">Sorry, I couldn't find the page you were looking for. It may have moved, or the address may be mistyped.</p>
+<ul class="mt-6 space-y-2">
+  <li><a href="/" class="text-primary hover:underline dark:text-primary-light">Go to the home page</a></li>
+  <li><a href="/blog/" class="text-primary hover:underline dark:text-primary-light">Read the blog</a></li>
+</ul>

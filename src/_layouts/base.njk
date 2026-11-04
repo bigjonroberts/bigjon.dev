@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="{{ site.language }}">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  {% if preview %}<meta name="robots" content="noindex">{% endif %}
+  <meta name="description" content="{{ description | default(site.description) }}">
+  <title>{% if title %}{{ title }} | {% endif %}{{ site.title }}</title>
+  <link rel="canonical" href="{{ page.url | htmlBaseUrl(site.url) }}">
+  <link rel="alternate" type="application/atom+xml" href="/feed.xml" title="{{ site.title }}">
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="icon" type="image/png" sizes="32x32" href="/_assets/favicons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/_assets/favicons/favicon-16x16.png">
+  <link rel="apple-touch-icon" href="/_assets/favicons/apple-touch-icon.png">
+  <link rel="shortcut icon" href="/_assets/favicons/favicon.ico">
+  <link rel="manifest" href="/_assets/favicons/site.webmanifest">
+</head>
+<body class="flex min-h-screen flex-col bg-white text-gray-900 antialiased dark:bg-gray-950 dark:text-gray-100">
+  <header class="border-b border-gray-200 dark:border-gray-800">
+    <div class="mx-auto flex max-w-3xl flex-wrap items-center justify-between gap-4 px-4 py-6">
+      <a href="/" class="text-xl font-bold tracking-tight">{{ site.title }}</a>
+      <nav aria-label="Main">
+        <ul class="flex flex-wrap gap-x-5 gap-y-2">
+          {%- for link in site.nav %}
+          <li><a href="{{ link.href }}" class="font-medium text-gray-700 hover:text-primary dark:text-gray-300 dark:hover:text-primary-light"{% if link.href == page.url %} aria-current="page"{% endif %}>{{ link.title }}</a></li>
+          {%- endfor %}
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main class="mx-auto w-full max-w-3xl flex-1 px-4 py-10">
+    {{ content | safe }}
+  </main>
+
+  <footer class="border-t border-gray-200 dark:border-gray-800">
+    <div class="mx-auto flex max-w-3xl flex-wrap items-center justify-between gap-4 px-4 py-6 text-sm text-gray-600 dark:text-gray-400">
+      <div>&copy; {{ currentYear }} {{ site.author }}</div>
+      <div class="flex gap-4">
+        <a href="{{ site.github }}" class="hover:text-primary dark:hover:text-primary-light" rel="me noopener noreferrer">GitHub</a>
+        <a href="/feed.xml" class="hover:text-primary dark:hover:text-primary-light">RSS</a>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

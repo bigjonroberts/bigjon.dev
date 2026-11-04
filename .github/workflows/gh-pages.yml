@@ -1,0 +1,138 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types: [opened, reopened, synchronize, closed]
+
+permissions:
+  contents: read
+
+# One run at a time per PR; a new push cancels an older in-flight run, but a
+# `closed` event never cancels, so it can't cut off a publish mid-push.
+# main serializes through its own non-cancelling 'pages-main' group.
+concurrency:
+  group: ${{ github.event_name == 'pull_request' && format('pages-pr-{0}', github.event.pull_request.number) || 'pages-main' }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' && github.event.action != 'closed' }}
+
+jobs:
+  # Tests and builds with a read-only token. The publish jobs below hold write
+  # access and never run PR code: they only download this job's artifact.
+  build:
+    if: github.event_name == 'push' || github.event.action != 'closed'
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+      - name: Use Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'pnpm'
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Smoke test
+        run: pnpm test
+      - name: Build preview
+        if: github.event_name == 'pull_request'
+        run: pnpm build
+        env:
+          PATH_PREFIX: /pr-preview/pr-${{ github.event.number }}/
+          PREVIEW: 'true'
+      - name: Disable Jekyll
+        run: touch _site/.nojekyll
+      - uses: actions/upload-artifact@v4
+        with:
+          name: site
+          path: _site
+          include-hidden-files: true
+          retention-days: 3
+
+  deploy:
+    if: github.event_name == 'push'
+    needs: build
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@v4
+        with:
+          name: site
+          path: _site
+      - uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: _site
+          branch: gh-pages
+          clean-exclude: pr-preview/
+          # Rebase onto concurrent preview pushes instead of force-pushing over them.
+          force: false
+
+  # Same-repo PRs only; forks get no preview.
+  preview-deploy:
+    if: >
+      github.event_name == 'pull_request' &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    needs: build
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      # A stale or now-closed run skips publishing instead of overwriting a
+      # newer or removed preview.
+      - name: Check PR is still open and current
+        id: freshness
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          read -r state head_sha <<<"$(gh pr view "${{ github.event.number }}" \
+            --repo "${{ github.repository }}" --json state,headRefOid \
+            --jq '[.state, .headRefOid] | @tsv')"
+          if [ "$state" = "OPEN" ] && [ "$head_sha" = "${{ github.event.pull_request.head.sha }}" ]; then
+            echo "stale=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "stale=true" >> "$GITHUB_OUTPUT"
+            echo "::notice::Skipping publish: PR state=$state, current head=$head_sha, this build's head=${{ github.event.pull_request.head.sha }}"
+          fi
+      - uses: actions/download-artifact@v4
+        if: steps.freshness.outputs.stale == 'false'
+        with:
+          name: site
+          path: _site
+      - uses: rossjrw/pr-preview-action@v1
+        if: steps.freshness.outputs.stale == 'false'
+        with:
+          source-dir: ./_site
+          pages-base-url: bigjon.dev
+
+  # Removes a closed PR's preview. No PR code runs (checkout only).
+  preview-close:
+    if: >
+      github.event_name == 'pull_request' &&
+      github.event.action == 'closed' &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: rossjrw/pr-preview-action@v1
+        with:
+          source-dir: ./_site
+          pages-base-url: bigjon.dev
