@@ -5,7 +5,9 @@ Tailwind CSS 4 and deployed to GitHub Pages.
 
 ## Development
 
-Requires Node.js 22 and pnpm 10.
+Node.js and pnpm versions are pinned in `package.json` and managed with [Volta](https://volta.sh/):
+install Volta, set `VOLTA_FEATURE_PNPM=1`, and the pinned versions are used automatically in this
+directory. CI reads the same Node version from `package.json`.
 
 ```sh
 make setup     # pnpm install
